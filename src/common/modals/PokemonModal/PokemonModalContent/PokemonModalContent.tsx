@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import { Button, ModalProps, PokemonTypes, Spinner, Typography } from '@common';
 import { useRequestPokemonByIdQuery } from '@utils/api';
-import { useStore } from '@utils/contexts';
 import { useAuthState, useUpdateDocumentMutation } from '@utils/firebase';
+import type { RootState } from '../../../../utils/contexts/store/store';
 
 import styles from './PokemonModalContent.module.css';
 
@@ -16,7 +17,8 @@ const MAX_USER_POKEMONS = 6;
 
 export const PokemonModalContent: React.FC<PokemonModalContentProps> = ({ pokemonId, onClose }) => {
   const navigate = useNavigate();
-  const { session } = useStore();
+
+  const session = useSelector((state: RootState) => state.session);
   const authState = useAuthState();
   const requestPokemonByIdQuery = useRequestPokemonByIdQuery({ id: pokemonId });
   const updateDocumentMutation = useUpdateDocumentMutation({
@@ -27,11 +29,11 @@ export const PokemonModalContent: React.FC<PokemonModalContentProps> = ({ pokemo
     }
   });
 
-  if (requestPokemonByIdQuery.isLoading || !requestPokemonByIdQuery.data?.data || !authState.data)
+  if (requestPokemonByIdQuery.isLoading || !requestPokemonByIdQuery.data?.data || !authState.data) {
     return <Spinner />;
-
+  }
   const isShowAddButton =
-    session.isLoginIn &&
+    session.isLogin &&
     authState.data.pokemons.length < MAX_USER_POKEMONS &&
     !authState.data.pokemons.some((pokemon) => pokemonId === pokemon.id);
 
@@ -42,7 +44,7 @@ export const PokemonModalContent: React.FC<PokemonModalContentProps> = ({ pokemo
     <div className={styles.pokemon_modal}>
       <Typography variant='title'>{pokemon.name}</Typography>
       <div className={styles.pokemon_image}>
-        <img src={pokemon.sprites.front_default ?? ''} alt='' />
+        <img src={pokemon.sprites.front_default ?? ''} alt={pokemon.name} />
       </div>
 
       <PokemonTypes types={pokemon.types} />

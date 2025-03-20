@@ -12,7 +12,7 @@ interface UseUpdateDocumentPokemonMutationParams {
 interface UseUpdateDocumentUserMutationParams {
   collection: Extract<Collection, 'users'>;
   data: Partial<UserDocument>;
-  id: string;
+  id: string | undefined;
 }
 
 type UseUpdateDocumentMutationParams =

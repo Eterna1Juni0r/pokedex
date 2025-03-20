@@ -1,19 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import { Button, Divider, ThemeButton, Typography, UserCard } from '@common';
 import { ROUTES } from '@utils/constants';
-import { INITIAL_STORE, useStore } from '@utils/contexts';
 import { useAuthState, useLogoutMutation } from '@utils/firebase';
+import { setIsLogin } from '../../../../../utils/contexts/store/SessionSlice';
 
 import { Burger } from '../Burger/Burger';
 
 import styles from './MobileMenu.module.css';
 
-export const MobileMenu = () => {
-  const { setStore } = useStore();
+export const MobileMenu: React.FC = () => {
+  const dispatch = useDispatch();
   const authState = useAuthState();
-
   const logoutMutation = useLogoutMutation();
   const [isActive, setIsActive] = React.useState(false);
 
@@ -63,7 +63,7 @@ export const MobileMenu = () => {
           <Button
             onClick={() => {
               logoutMutation.mutate({});
-              setStore(INITIAL_STORE);
+              dispatch(setIsLogin(false));
             }}
           >
             LOGOUT

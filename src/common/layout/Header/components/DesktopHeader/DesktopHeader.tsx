@@ -1,16 +1,17 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import { Button, ThemeButton, Typography } from '@common';
 import { ROUTES } from '@utils/constants';
-import { INITIAL_STORE, useStore } from '@utils/contexts';
 import { useAuthState, useLogoutMutation } from '@utils/firebase';
+import { setIsLogin } from '../../../../../utils/contexts/store/SessionSlice';
 
 import styles from './DesktopHeader.module.css';
 
-export const DesktopHeader = () => {
-  const { setStore } = useStore();
+export const DesktopHeader: React.FC = () => {
+  const dispatch = useDispatch();
   const authState = useAuthState();
-
   const logoutMutation = useLogoutMutation();
 
   return (
@@ -52,13 +53,13 @@ export const DesktopHeader = () => {
           <ThemeButton />
           {authState.data && authState.data.photoURL && (
             <Link to={ROUTES.PROFILE}>
-              <img src={authState.data.photoURL} alt='photoURL' />
+              <img src={authState.data.photoURL} alt='User avatar' />
             </Link>
           )}
           <Button
             onClick={() => {
               logoutMutation.mutate({});
-              setStore(INITIAL_STORE);
+              dispatch(setIsLogin(false));
             }}
           >
             LOGOUT

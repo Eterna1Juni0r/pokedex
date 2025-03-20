@@ -1,13 +1,14 @@
+import React from 'react';
 import classnames from 'classnames';
-
 import { Button, PokemonShortCard, Spinner, Typography, UserCard } from '@common';
-import { INITIAL_STORE, useStore } from '@utils/contexts';
 import { useAuthState, useLogoutMutation } from '@utils/firebase';
+import { useDispatch } from 'react-redux';
+import { setIsLogin } from '../../utils/contexts/store/SessionSlice';
 
 import styles from './ProfilePage.module.css';
 
-export const ProfilePage = () => {
-  const { setStore } = useStore();
+export const ProfilePage: React.FC = () => {
+  const dispatch = useDispatch();
   const authState = useAuthState();
   const logoutMutation = useLogoutMutation();
 
@@ -28,7 +29,7 @@ export const ProfilePage = () => {
       <Button
         onClick={() => {
           logoutMutation.mutate({});
-          setStore(INITIAL_STORE);
+          dispatch(setIsLogin(false));
         }}
       >
         LOGOUT

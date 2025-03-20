@@ -13,7 +13,7 @@ export const UsersPage = () => {
     <div className='page'>
       <div className={styles.users}>
         {users.map((user) => (
-          <UserCard user={user} />
+          <UserCard key={user.uid} user={user} />
         ))}
       </div>
     </div>

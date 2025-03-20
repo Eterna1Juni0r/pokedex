@@ -1,40 +1,21 @@
-import React from 'react';
+// App.tsx (или любой компонент верхнего уровня)
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useAuthState } from '../../firebase/hooks'; // предположим, ваш кастомный хук
+import { setIsLogin } from './SessionSlice';
+import type { AppDispatch } from './store';
 
-import { useAuthState } from '@utils/firebase';
-
-import type { StoreContextProps } from './StoreContext';
-import { StoreContext } from './StoreContext';
-
-interface StoreProviderProps {
-  children: React.ReactNode;
-}
-
-export const StoreProvider: React.FC<StoreProviderProps> = ({ children }) => {
+export const StoreProvider = ({ children }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const authState = useAuthState();
-  const [store, setStore] = React.useState<StoreContextProps['store']>({
-    session: {
-      isLoginIn: false
+
+  useEffect(() => {
+    if (authState?.data) {
+      dispatch(setIsLogin(true));
+    } else {
+      dispatch(setIsLogin(false));
     }
-  });
+  }, [authState, dispatch]);
 
-  React.useEffect(() => {
-    if (authState.data) {
-      setStore({
-        ...store,
-        session: {
-          isLoginIn: true
-        }
-      });
-    }
-  }, [authState.data]);
-
-  const value = React.useMemo(
-    () => ({
-      store,
-      setStore
-    }),
-    [store]
-  );
-
-  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+  return <div>{children}</div>;
 };

@@ -1,10 +1,12 @@
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import { Button, Input } from '@common';
 import { emailSchema, passwordSchema, ROUTES } from '@utils/constants';
-import { useStore } from '@utils/contexts';
 import { useLogInWithEmailAndPasswordMutation } from '@utils/firebase';
+import { setIsLogin } from '../../../../utils/contexts/store/SessionSlice';
 
 import styles from '../../AuthPage.module.css';
 
@@ -14,14 +16,14 @@ interface SignInFormValues {
 }
 
 export const SignInForm: React.FC = () => {
-  const { setStore } = useStore();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState } = useForm<SignInFormValues>({ mode: 'onBlur' });
   const logInWithEmailAndPassword = useLogInWithEmailAndPasswordMutation({
     options: {
       onSuccess: () => {
-        setStore({ session: { isLoginIn: true } });
+        dispatch(setIsLogin(true));
         navigate(ROUTES.POKEMONS);
       }
     }
@@ -33,7 +35,7 @@ export const SignInForm: React.FC = () => {
   return (
     <form
       className={styles.form}
-      onSubmit={handleSubmit(async ({ password, email }) =>
+      onSubmit={handleSubmit(async ({ email, password }) =>
         logInWithEmailAndPassword.mutate({
           email,
           password

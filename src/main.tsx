@@ -1,10 +1,11 @@
 import { createRoot } from 'react-dom/client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { StoreProvider, ThemeProvider } from '@utils/contexts';
-
+import { ThemeProvider } from '@utils/contexts';
+import { StoreProvider } from './utils/contexts/store/StoreProvider';
+import { store } from './utils/contexts/store/theme/store';
 import { App } from './App';
+import { Provider } from 'react-redux';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,11 +20,12 @@ const root = createRoot(container);
 
 root.render(
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <StoreProvider>
-        <App />
-      </StoreProvider>
-    </ThemeProvider>
-    <ReactQueryDevtools initialIsOpen={false} />
+    <Provider store={store}>
+      <ThemeProvider>
+        <StoreProvider>
+          <App />
+        </StoreProvider>
+      </ThemeProvider>
+    </Provider>
   </QueryClientProvider>
 );

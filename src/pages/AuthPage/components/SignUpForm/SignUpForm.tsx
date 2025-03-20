@@ -1,10 +1,11 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import { Button, Input } from '@common';
 import { citySchema, emailSchema, nameSchema, passwordSchema, ROUTES } from '@utils/constants';
-import { useStore } from '@utils/contexts';
 import { useRegisterWithEmailAndPasswordMutation } from '@utils/firebase';
+import { setIsLogin } from '../../../../utils/contexts/store/SessionSlice';
 
 import styles from '../../AuthPage.module.css';
 
@@ -14,13 +15,14 @@ interface SignUpFormValues extends User {
 }
 
 export const SignUpForm: React.FC = () => {
-  const { setStore } = useStore();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { register, handleSubmit, formState, setError } = useForm<SignUpFormValues>();
+
   const registerWithEmailAndPasswordMutation = useRegisterWithEmailAndPasswordMutation({
     options: {
       onSuccess: () => {
-        setStore({ session: { isLoginIn: true } });
+        dispatch(setIsLogin(true));
         navigate(ROUTES.POKEMONS);
       },
       onError: (error) => {

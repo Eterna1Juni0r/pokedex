@@ -1,3 +1,3 @@
-export * from './StoreContext';
+export * from './SessionSlice';
 export * from './StoreProvider';
-export * from './useStore';
+export * from './store';

@@ -1,10 +1,11 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 
 import { Button, Input, ModalProps, Typography } from '@common';
 import { citySchema, nameSchema } from '@utils/constants';
-import { useStore } from '@utils/contexts';
 import { useUpdateDocumentMutation } from '@utils/firebase';
+import type { RootState } from '../../../../utils/contexts/store/store';
 
 import styles from './SettingChangeModalContent.module.css';
 
@@ -12,13 +13,13 @@ export type SettingModalItem = {
   type: keyof Pick<User, 'city' | 'displayName' | 'phoneNumber'>;
   value: string;
 };
+
 interface SettingChangeModalContentProps extends Pick<ModalProps, 'onClose'> {
   setting: SettingModalItem;
 }
 
 const validateSchema = {
   city: citySchema,
-
   displayName: nameSchema,
   phoneNumber: nameSchema
 };
@@ -27,7 +28,9 @@ export const SettingChangeModalContent: React.FC<SettingChangeModalContentProps>
   setting,
   onClose
 }) => {
-  const { user } = useStore();
+  // Правильный селектор: берем user из state.session.user
+  const user = useSelector((state: RootState) => state.session.user);
+
   const updateDocumentMutation = useUpdateDocumentMutation({
     options: {
       onSuccess: () => {
@@ -51,7 +54,7 @@ export const SettingChangeModalContent: React.FC<SettingChangeModalContentProps>
         updateDocumentMutation.mutate({
           collection: 'users',
           data: { [setting.type]: values[setting.type] },
-          id: user.uid
+          id: user?.uid
         })
       )}
     >
@@ -64,7 +67,6 @@ export const SettingChangeModalContent: React.FC<SettingChangeModalContentProps>
       <Button variant='outlined' type='submit' loading={loading}>
         CHANGE
       </Button>
-
       <Button onClick={onClose} disabled={loading}>
         CANCEL
       </Button>
