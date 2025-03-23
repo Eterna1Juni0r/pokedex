@@ -5,12 +5,27 @@ import { useAuthState, useLogoutMutation } from '@utils/firebase';
 import { useDispatch } from 'react-redux';
 import { setIsLogin } from '../../utils/contexts/store/SessionSlice';
 
+import { setUser } from '../../utils/contexts/store/SessionSlice';
+
 import styles from './ProfilePage.module.css';
 
 export const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
   const authState = useAuthState();
   const logoutMutation = useLogoutMutation();
+
+  React.useEffect(() => {
+    if (authState.data) {
+      dispatch(
+        setUser({
+          uid: authState.data.uid,
+          pokemons: authState.data.pokemons
+        })
+      );
+    } else {
+      dispatch(setUser(null));
+    }
+  }, [authState.data, dispatch]);
 
   if (!authState.data) return <Spinner />;
   const user = authState.data;

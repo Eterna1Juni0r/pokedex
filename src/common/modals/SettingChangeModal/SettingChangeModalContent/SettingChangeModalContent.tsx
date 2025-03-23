@@ -28,7 +28,7 @@ export const SettingChangeModalContent: React.FC<SettingChangeModalContentProps>
   setting,
   onClose
 }) => {
-  // Правильный селектор: берем user из state.session.user
+  // Изменено: берём user из state.session.user, а не state.user
   const user = useSelector((state: RootState) => state.session.user);
 
   const updateDocumentMutation = useUpdateDocumentMutation({
@@ -47,6 +47,11 @@ export const SettingChangeModalContent: React.FC<SettingChangeModalContentProps>
   const { isSubmitting, errors } = formState;
   const loading = isSubmitting || updateDocumentMutation.isLoading;
 
+  // Если пользователь не загружен, можно вывести сообщение или Spinner
+  if (!user) {
+    return <Typography variant='sub-title'>User data not loaded</Typography>;
+  }
+
   return (
     <form
       className={styles.setting_modal}
@@ -54,7 +59,7 @@ export const SettingChangeModalContent: React.FC<SettingChangeModalContentProps>
         updateDocumentMutation.mutate({
           collection: 'users',
           data: { [setting.type]: values[setting.type] },
-          id: user?.uid
+          id: user.uid
         })
       )}
     >

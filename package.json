@@ -11,6 +11,8 @@
     "lint": "eslint src/**/*.{tsx,ts}"
   },
   "dependencies": {
+    "@cloudinary/react": "^1.14.1",
+    "@cloudinary/url-gen": "^1.21.0",
     "@reduxjs/toolkit": "^2.6.1",
     "@tanstack/react-query": "^4.0.10",
     "axios": "^0.27.2",

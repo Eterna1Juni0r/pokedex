@@ -1,8 +1,7 @@
 import React from 'react';
 
 import { Button } from '@common';
-import { useUpdateDocumentMutation, useUploadFile } from '@utils/firebase';
-
+import { useUpdateDocumentMutation, useUploadFile } from '@utils/firebase'; // <-- проверьте правильность пути
 import type { ModalProps } from '../Modal/Modal';
 import { Modal } from '../Modal/Modal';
 
@@ -12,25 +11,36 @@ interface UploadPhotoModalProps extends Omit<ModalProps, 'children' | 'loading'>
 
 export const UploadPhotoModal: React.FC<UploadPhotoModalProps> = ({ onClose, uid, ...props }) => {
   const [loading, setLoading] = React.useState(false);
-
-  const photoName = `photo_${uid}`;
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const { uploadFile, progresspercent } = useUploadFile(photoName);
+
+  // Если нужно как-то использовать uid (например, для лога), можно передать photoName
+  // Но для unsigned-загрузки Cloudinary это не обязательно
+  // const photoName = `photo_${uid}`;
+  // const { uploadFile, progresspercent } = useUploadFile(photoName);
+
+  const { uploadFile, progresspercent } = useUploadFile();
   const updateDocumentMutation = useUpdateDocumentMutation();
 
   const onFileInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return;
+    if (!event.target.files || event.target.files.length === 0) return;
+
     setLoading(true);
-    const result = await uploadFile(event.target.files[0]);
+    try {
+      // Результат должен иметь вид { url: string }
+      const result = await uploadFile(event.target.files[0]);
 
-    await updateDocumentMutation.mutateAsync({
-      collection: 'users',
-      data: { photoURL: result?.url },
-      id: uid
-    });
+      await updateDocumentMutation.mutateAsync({
+        collection: 'users',
+        data: { photoURL: result.url },
+        id: uid
+      });
 
-    onClose();
-    setLoading(false);
+      onClose();
+    } catch (error) {
+      console.error('Ошибка при загрузке файла:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -1,54 +1,43 @@
-import {
-  getDownloadURL,
-  ref,
-  uploadBytesResumable,
-  UploadMetadata,
-  UploadResult,
-  UploadTaskSnapshot
-} from 'firebase/storage';
-import React from 'react';
+// useUploadFile.ts
+import { useState } from 'react';
+import axios from 'axios';
 
-import { usePromise } from '@utils/hooks';
+const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
-import { storage } from '../instance';
+interface UploadResult {
+  url: string;
+}
 
-export const useUploadFile = (fileName: string) => {
-  const storageRef = ref(storage, fileName);
-  const { isLoading, setIsLoading, isError, setError, error } = usePromise<UploadResult>();
+export const useUploadFile = () => {
+  const [progresspercent, setProgresspercent] = useState(0);
 
-  const [snapshot, setSnapshot] = React.useState<UploadTaskSnapshot>();
-  const [progresspercent, setProgresspercent] = React.useState(0);
+  const uploadFile = async (file: File): Promise<UploadResult> => {
+    if (!CLOUD_NAME || !UPLOAD_PRESET) {
+      throw new Error('Cloudinary configuration is missing in the environment variables');
+    }
 
-  const uploadFile = async (
-    data: Blob | Uint8Array | ArrayBuffer,
-    metadata?: UploadMetadata | undefined
-  ): Promise<(UploadResult & { url: string }) | undefined> =>
-    new Promise((resolve, reject) => {
-      setIsLoading(true);
-      const uploadTask = uploadBytesResumable(storageRef, data, metadata);
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          setSnapshot(snapshot);
-          setProgresspercent(progress);
-        },
-        (error) => {
-          setError(error.message);
-          reject(new Error('something went wrong with file uploading'));
-        },
-        async () => {
-          const url = await getDownloadURL(uploadTask.snapshot.ref);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', UPLOAD_PRESET);
 
-          resolve({
-            url,
-            metadata: uploadTask.snapshot.metadata,
-            ref: uploadTask.snapshot.ref
-          });
-          setIsLoading(false);
+    const response = await axios.post(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (event) => {
+          if (event.total) {
+            const progress = Math.round((event.loaded * 100) / event.total);
+            setProgresspercent(progress);
+          }
         }
-      );
-    });
+      }
+    );
 
-  return { uploadFile, progresspercent, snapshot, isUploading: isLoading, error, isError };
+    // ВАЖНО: верните объект, где есть поле url
+    return { url: response.data.secure_url };
+  };
+
+  return { uploadFile, progresspercent };
 };

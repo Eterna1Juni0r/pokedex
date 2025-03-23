@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface Pokemon {
   id: number;
   name: string;
-  image: string;
+  image: string | null;
 }
 
 interface User {
