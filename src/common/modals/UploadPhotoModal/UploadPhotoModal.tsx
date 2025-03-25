@@ -1,7 +1,7 @@
+// UploadPhotoModal.tsx
 import React from 'react';
-
-import { Button } from '@common';
-import { useUpdateDocumentMutation, useUploadFile } from '@utils/firebase'; // <-- проверьте правильность пути
+import { Button } from '@common'; // замените путь, если нужно
+import { useUpdateDocumentMutation, useUploadFile } from '@utils/firebase'; // путь к вашему хуку
 import type { ModalProps } from '../Modal/Modal';
 import { Modal } from '../Modal/Modal';
 
@@ -13,22 +13,21 @@ export const UploadPhotoModal: React.FC<UploadPhotoModalProps> = ({ onClose, uid
   const [loading, setLoading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  // Если нужно как-то использовать uid (например, для лога), можно передать photoName
-  // Но для unsigned-загрузки Cloudinary это не обязательно
-  // const photoName = `photo_${uid}`;
-  // const { uploadFile, progresspercent } = useUploadFile(photoName);
-
+  // Получаем uploadFile и прогресс
   const { uploadFile, progresspercent } = useUploadFile();
   const updateDocumentMutation = useUpdateDocumentMutation();
 
   const onFileInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || event.target.files.length === 0) return;
-
     setLoading(true);
     try {
-      // Результат должен иметь вид { url: string }
+      // result будет { url: string }
       const result = await uploadFile(event.target.files[0]);
 
+      console.log('Загружаемый файл:', event.target.files[0]);
+      console.log('Результат Cloudinary:', result);
+
+      // Обновляем документ в Firestore (или вашей базе) с новым photoURL
       await updateDocumentMutation.mutateAsync({
         collection: 'users',
         data: { photoURL: result.url },

@@ -1,7 +1,6 @@
 {
-  "name": "📕 POKEDEX",
+  "name": "pokedex",
   "version": "1.0.0",
-  "author": "Dmitriy Babin (https://github.com/debabin)",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -17,6 +16,7 @@
     "@tanstack/react-query": "^4.0.10",
     "axios": "^0.27.2",
     "classnames": "^2.3.1",
+    "cloudinary": "^2.6.0",
     "firebase": "^11.4.0",
     "prettier": "^2.7.1",
     "react": "^18.0.0",

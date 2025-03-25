@@ -19,12 +19,13 @@ export const SettingsPage = () => {
   if (!authState.data) return <Spinner />;
   const user = authState.data;
 
-  const photoURL = user.photoURL!;
+  const defaultPhotoURL = 'src/assets/img/nullAvatar.jpg';
+  const photoURL = user.photoURL || defaultPhotoURL;
 
   return (
     <div className={classnames('page', styles.settings_container)}>
       <div className={styles.image_container}>
-        <img aria-hidden src={photoURL} alt='photoURL' />
+        <img aria-hidden src={photoURL} alt='URLPhoto' />
         <div>
           <IconButton
             icon={<PenIcon />}
